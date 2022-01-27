@@ -1,0 +1,275 @@
+program code:
+// c program for  the above approach
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+
+// structure of the employee
+struct emp {
+    char name[50];
+    float salary;
+    int age;
+    int id;
+};
+struct emp e;
+
+// size of the structure
+long int size = sizeof(e);
+
+// in the start coordinates
+// will be 0, 0
+coord cord = { 0, 0 };
+
+// function to set the
+// coordinates
+void gotoxy(int x, int y)
+{
+    cord.x = x;
+    cord.y = y;
+    setconsolecursorposition(
+        getstdhandle(std_output_handle),
+        cord);
+}
+
+file *fp, *ft;
+
+// function to add the records
+void addrecord()
+{
+    system("cls");
+    fseek(fp, 0, seek_end);
+    char another = 'y';
+
+    while (another == 'y') {
+        printf("\nenter name : ");
+        scanf("%s", e.name);
+
+        printf("\nenter age : ");
+        scanf("%d", &e.age);
+
+        printf("\nenter salary : ");
+        scanf("%f", &e.salary);
+
+        printf("\nenter emp-id : ");
+        scanf("%d", &e.id);
+
+        fwrite(&e, size, 1, fp);
+
+        printf("\nwant to add another"
+               " record (y/n) : ");
+        fflush(stdin);
+
+        scanf("%c", &another);
+    }
+}
+
+// function to delete the records
+void deleterecord()
+{
+    system("cls");
+    char empname[50];
+    char another = 'y';
+
+    while (another == 'y') {
+        printf("\nenter employee "
+               "name to delete : ");
+        scanf("%s", empname);
+
+        ft = fopen("temp.txt", "wb");
+        rewind(fp);
+
+        while (fread(&e, size,
+                     1, fp)
+               == 1) {
+            if (strcmp(e.name,
+                       empname)
+                != 0)
+                fwrite(&e, size, 1, ft);
+        }
+
+        fclose(fp);
+        fclose(ft);
+        remove("data.txt");
+        rename("temp.txt", "data.txt");
+        fp = fopen("data.txt", "rb+");
+
+        printf("\nwant to delete another"
+               " record (y/n) :");
+        fflush(stdin);
+        another = getche();
+    }
+}
+
+// function to display the record
+void displayrecord()
+{
+    system("cls");
+
+    // sets pointer to start
+    // of the file
+    rewind(fp);
+
+    printf("\n========================="
+           "==========================="
+           "======");
+    printf("\nname\t\tage\t\tsalary\t\t"
+           "\tid\n",
+           e.name, e.age,
+           e.salary, e.id);
+    printf("==========================="
+           "==========================="
+           "====\n");
+
+    while (fread(&e, size, 1, fp) == 1)
+        printf("\n%s\t\t%d\t\t%.2f\t%10d",
+               e.name, e.age, e.salary, e.id);
+
+    printf("\n\n\n\t");
+    system("pause");
+}
+
+// function to modify the record
+void modifyrecord()
+{
+    system("cls");
+    char empname[50];
+    char another = 'y';
+
+    while (another == 'y') {
+        printf("\nenter employee name"
+               " to modify : ");
+        scanf("%s", empname);
+
+        rewind(fp);
+
+        // while file is open
+        while (fread(&e, size, 1, fp) == 1) {
+            // compare the employee name
+            // with ename
+            if (strcmp(e.name, empname) == 0) {
+                printf("\nenter new name:");
+                scanf("%s", e.name);
+                printf("\nenter new age :");
+                scanf("%d", &e.age);
+                printf("\nenter new salary :");
+                scanf("%f", &e.salary);
+                printf("\nenter new emp-id :");
+                scanf("%d", &e.id);
+
+                fseek(fp, -size, seek_cur);
+                fwrite(&e, size, 1, fp);
+                break;
+            }
+        }
+
+        // ask for modifying another record
+        printf("\nwant to modify another"
+               " record (y/n) :");
+        fflush(stdin);
+        scanf("%c", &another);
+    }
+}
+
+// driver code
+int main()
+{
+    int choice;
+
+    // opening the file
+    fp = fopen("data.txt", "rb+");
+
+    // showing error if file is
+    // unable to open.
+    if (fp == null) {
+        fp = fopen("data.txt", "wb+");
+        if (fp == null) {
+            printf("\ncannot open file...");
+            exit(1);
+        }
+    }
+
+    system("color 3f");
+    printf("\n\n\n\n\t\t\t\t============="
+           "============================="
+           "===========");
+    printf("\n\t\t\t\t~~~~~~~"
+           "~~~~~~~~~~~"
+           "~~~");
+    printf("\n\t\t\t\t==================="
+           "============================="
+           "=====");
+    printf("\n\t\t\t\t[|:::>:::>:::>::>  "
+           "employee record  <::<:::<:::"
+           "<:::|]\t");
+    printf("\n\t\t\t\t==================="
+           "============================="
+           "=====");
+    printf("\n\t\t\t\t~~~~~~~~"
+           "~~~~~~~~~~"
+           "~");
+    printf("\n\t\t\t\t====================="
+           "==============================\n");
+    printf("\n\n\n\t\t\t\t\t\t\t\t\t\t"
+           "developer :  poojitha"
+           "\n\n\t\t\t\t");
+
+    system("pause");
+
+    while (1) {
+        // clearing console and asking the
+        // user for input
+        system("cls");
+        gotoxy(30, 10);
+        printf("\n1. add record\n");
+        gotoxy(30, 12);
+        printf("\n2. delete record\n");
+        gotoxy(30, 14);
+        printf("\n3. display records\n");
+        gotoxy(30, 16);
+        printf("\n4. modify record\n");
+        gotoxy(30, 18);
+        printf("\n5. exit\n");
+        gotoxy(30, 20);
+        printf("\nenter your choice...\n");
+        fflush(stdin);
+        scanf("%d", &choice);
+
+        // switch case
+        switch (choice) {
+        case 1:
+
+            // add the records
+            addrecord();
+            break;
+
+        case 2:
+
+            // delete the records
+            deleterecord();
+            break;
+
+        case 3:
+
+            // display the records
+            displayrecord();
+            break;
+
+        case 4:
+
+            // modify the records
+            modifyrecord();
+            break;
+
+        case 5:
+            fclose(fp);
+            exit(0);
+            break;
+
+        default:
+            printf("\ninvalid choice...\n");
+        }
+    }
+
+    return 0;
+}
